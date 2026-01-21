@@ -13,27 +13,44 @@
     }
   </style>
 <script>
-    async function loadPlanes(){
-        const response = await fetch('https://opensky-network.org/api/states/all').then(p=>p.json());
-        const planeData = response["states"];
-        return planeData.map(d => ({
-            lat: d[6],
-            lng: d[5],
-            size: 13,
-            color: 'red'
-        }));
-    }
+  async function loadPlanes() { 
+    const response = await fetch('https://opensky-network.org/api/states/all').then(p => p.json());
+    const planeData = response["states"];
+    
+    return planeData
+    .filter(d => d[6] !== null && d[5] !== null)
+    .map(d => ({
+    lat: d[6],
+    lng: d[5],
+    size: 10,
+    color: d[8] === true ? 'red' : 'white'
+    }));
+  }
 
-    async function updatePlanePositions(world) {
-        setInterval(async () => {
-            const updatedData = await loadPlanes();
-            world.htmlElementsData(updatedData);
-        }, 60000);
-        console.log("Plane positions updating every minute.");
-    }
+  async function updatePlanePositions(world) {
+    setInterval(async () => {
+      const updatedData = await loadPlanes();
+      world.htmlElementsData(updatedData);
+    }, 60000);
+  }
+
+  function isMarkerVisible(lat, lng, globeRotation) {
+    const toRad = angle => angle * Math.PI / 180;
+    const markerVector = new THREE.Vector3(
+      Math.cos(toRad(lat)) * Math.cos(toRad(lng)),
+      Math.sin(toRad(lat)),
+      Math.cos(toRad(lat)) * Math.sin(toRad(lng))
+    );
+    const globeVector = new THREE.Vector3(
+      Math.cos(toRad(globeRotation.y)) * Math.cos(toRad(globeRotation.x)),
+      Math.sin(toRad(globeRotation.y)),
+      Math.cos(toRad(globeRotation.y)) * Math.sin(toRad(globeRotation.x))
+    );
+    return markerVector.dot(globeVector) > 0;
+  }
 </script>
 
-  <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
+<script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
 <!--  <script src="../../dist/globe.gl.js"></script>-->
 </head>
 
