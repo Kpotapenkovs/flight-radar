@@ -14,8 +14,8 @@
   </style>
 <script>
   async function loadPlanes() { 
-    const response = await fetch('https://opensky-network.org/api/states/all').then(p => p.json());
-    const planeData = response["states"];
+    const response = await fetch('/api').then(p => p.json());
+    const planeData = await response["states"];
     
     const degree = 57.2958; 
 
@@ -28,6 +28,9 @@
       color: d[8] === true ? 'red' : 'white',
       heading: d[10] * degree 
     }));
+
+
+
   }
 
   function planeData(){
@@ -45,6 +48,9 @@
       size: 5,
       color: d[8] === true ? 'red' : 'white'
     };
+
+
+
   }
 
   async function updatePlanePositions(world) {
@@ -152,16 +158,9 @@
 
 // ----------- Marker SVG -----------
 
-    const markerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" transform="rotate()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plane"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7" /></svg>
-    `;
 
-    //const N = 30;
-   // const gData = [...Array(N).keys()].map(() => ({
-    //  lat: (Math.random() - 0.5) * 180,
-   //   lng: (Math.random() - 0.5) * 360,
-    //  size: 5,
-   //   color: 'yellow'
-  //  }));
+const markerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" transform="rotate()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plane"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7" /></svg>
+    `;
 
   const gData = await loadPlanes();
 
