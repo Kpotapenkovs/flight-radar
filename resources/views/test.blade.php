@@ -13,11 +13,18 @@
     }
     .planeData{
       display: absolute;
-      background-color: white;
-      justify-content: left;
-      align-items: left;
+      background-color: rgb(231, 231, 231);
       height: 100%;
       width: 300px;
+      border-radius: 10px;
+    }
+    .exit{
+      float: right; 
+      background: red; 
+      color: white; 
+      border: none; 
+      border-radius: 3px; 
+      cursor: pointer;
     }
   </style>
 <script>
@@ -34,7 +41,15 @@
       lng: d[5],
       size: 5,
       color: d[8] === true ? 'red' : 'white',
-      heading: d[10] + 90
+      heading: d[10] + 90,
+      callName: d[1],
+      reg_country: d[2],
+      last_contact: new Date(d[3] * 1000).toLocaleString(),
+      last_signal_time: new Date(d[4] * 1000).toLocaleString(),
+      height: d[7],
+      status: d[8] === true ? 'on ground' : 'in sky',
+      speed_KMH: d[9] * 3.6,
+      GPSheight: d[12]
     }));
 
     const markerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" transform="rotate()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plane"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7" /></svg>
@@ -204,17 +219,31 @@
       .htmlElementsData(gData)
       .htmlElement(d => {
         const el = document.createElement('div');
-        el.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" transform="rotate(${d.heading})" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plane"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7" /></svg>
-        `;
+       
         el.style.color = d.color;
         el.style.width = `${d.size}px`;
         el.style.transition = 'opacity 250ms';
         el.style['pointer-events'] = 'auto';
         el.style.cursor = 'pointer';
+          el.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" transform="rotate(${d.heading})" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plane"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7" /></svg>
+          `;
 
         el.onclick = () => {
+          if (document.querySelector('.planeData')) {
+            document.querySelector('.planeData').remove();
+          }
+
+          // ja nav info tad lidmašīnas ikona ir pēc deafult
+            document.querySelectorAll('.icon-tabler-plane').forEach(plane => {
+            plane.setAttribute('color', 'white');
+            plane.setAttribute('width', '12');
+            plane.setAttribute('height', '12');
+            });
+
+
+            //info panele
           let planeInfo = document.querySelector('.planeData');
-          if (!planeInfo) {
+
             planeInfo = document.createElement('div');
             planeInfo.classList.add('planeData');
             planeInfo.style.position = 'fixed';
@@ -222,15 +251,49 @@
             planeInfo.style.left = '0';
             planeInfo.style.padding = '10px';
             planeInfo.style.border = '1px solid black';
-            planeInfo.style.boxShadow = '2px 2px 5px rgba(0,0,0,0.5)';
             document.body.appendChild(planeInfo);
-          }
-          
-          planeInfo.innerHTML = `
-            <p>Latitude: ${d.lat}</p>
-            <p>Longitude: ${d.lng}</p>
-            <p>Heading: ${d.heading}</p>
-          `;
+
+            //datu izvadīšana logā
+            planeInfo.innerHTML = `
+              <button style="exit">X</button>
+              <p>callname: ${d.callName}</p>
+              <hr>
+              <p>reg country: ${d.reg_country}</p>
+              <hr>
+              <p>last contact: ${d.last_contact}</p>
+              <hr>
+              <p>last signal time: ${d.last_signal_time}</p>
+              <hr>
+              <p>height: ${d.height}</p>
+              <hr>
+              <p>status: ${d.status}</p>
+              <hr>
+              <p>speed km/h: ${d.speed_KMH}</p>
+              <hr>
+              <p>GPS height: ${d.GPSheight}</p>
+              <hr>
+              <p>Latitude: ${d.lat}</p>
+              <hr>
+              <p>Longitude: ${d.lng}</p>
+              <hr>
+            `;
+            
+            //ja ir izvadīta info tad lidmašīna ir izcelta
+        if (document.querySelector('.planeData')){
+ el.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" color="yellow" width="18" height="18" transform="rotate(${d.heading})" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plane"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7" /></svg>
+        `;
+        }
+        
+        //kad aizver logu lidmašīnas izskats ir pēc deafult
+
+            const closeButton = planeInfo.querySelector('button');
+            closeButton.onclick = () => { planeInfo.remove();
+
+                  if (!document.querySelector('.planeData')){
+            el.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" color="white" width="12" height="12" transform="rotate(${d.heading})" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plane"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3l4 7" /></svg>
+        `;
+        }
+      }
         };
 
         return el;
